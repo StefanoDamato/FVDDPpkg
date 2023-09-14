@@ -1,0 +1,292 @@
+---
+title: "FVDDPpkg"
+author: "Stefano Damato"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{FVDDPpkg}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+bibliography: REFERENCES.bib
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+\newcommand{\bfm}{\mathbf{m}}
+\newcommand{\bfn}{\mathbf{n}}
+\newcommand{\bfnpast}{\mathbf{n}_{i-1}}
+\newcommand{\bfnfuture}{\mathbf{n}_{i+1}}
+\newcommand{\bfkpast}{\mathbf{k}_{i-1}}
+\newcommand{\bfkfuture}{\mathbf{k}_{i+1}}
+
+## Introduction
+
+Before starting, it should be mentioned that the sole purpose of this paper is to provide intuitive and easily replicable instructions on how to use the FVDDPpkg package on \textsf{R}. For this reason, the underlying theory will not be developed except in the minimum necessary terms; for more information, please refer to the bibliography cited here.
+
+First of all, import the package.
+```{r setup, echo = T, results = 'hide', message = F}
+library(FVDDPpkg)
+```
+As shown in the work of @PapaspiliopoulosRuggieroSpanò2016 Fleming-Viot Dependent Dirichlet Processes (FVDDP), conditioned on observed data $Y$, take the general form of finite mixtures of Dirichlet Processes: in fact
+$$X_t \ | \ Y \sim \sum_{\mathbf{m} \in M} w_\bfm \Pi_{\alpha + \sum_{j=1}^K m_j \delta_{y_j^\ast}}$$
+where 
+
+* $X_t$ is the state of the process, also denoted as $latent\ signal$ in the related literature. Its dependence on the time $t$ is crucial, since the aim of this package is to perform the computations required to estimate its state at different times.
+* $\mathbf{y}^\ast = (y_1^\ast, \dots, y_K^\ast)$ is a $K$-dimensional vector containing all observed unique values.
+* $M$ is a set of multiplicities; its elements are $K$-dimensional integer vectors in the form $\bfm = (m_1, \dots, m_K)$. Intuitively, they can be thought as their $j$-th entry counts the occurences of the $j$-th unique value, $y_j^\ast$.
+* $w_\bfm$ is the weight associated to the vector $\bfm \in M$. By definition, weights are positive and sum up to $1$.
+* $\Pi_\alpha$ denotes the law of a Dirchet process, as introduced by Ferguson.
+* $\alpha$ is the characterizing measure of a Dirichlet Process. In turn, it can be expressed as
+$\alpha = \theta P_0$, where $\theta$ is the intensity, and the probability measure $P_0$ gives the centering. For a wide review of the Dirichlet Process and its properties, refer to @GhoshalVanDerVaart2017.
+* $\delta_y$ is a Dirac measure who puts mass on the point $y$.
+
+The derivation of this model, which stems from the study of population genetics, is done by exploiting the concept of duality for Markov processes (@PapaspiliopoulosRuggiero2014) by applying it to the results of @EthierGriffiths1993, among the others, from the seminal work of @FlemingViot1979.
+
+## Initialization
+
+In order to understand how to recover the previous expression, start noting that, unconditional on observed data
+$$X_{t_0} \sim \Pi_{\alpha},$$
+where the time is arbitrarily set $t=t_0$. This means that, while no data is included within the model, FVDDP can be fully characterized by $\theta$ and $P_0$. The creation of a process is carried out using the function `initialize` The user has to specify the positive real number `theta` and two functions, the first to sample from $P_0$ and the second to evaluate its p.d.f. or p.m.f., depending whether it is atomic or not; this is specified by the last argument, `atomic`. The function returns an object of class `fvddp`.
+
+```{r}
+FVDDP = initialize(theta = 1.28, sampling.f = function(x) rpois(x, 5),
+                   density.f = function(x) dpois(x, 5), TRUE)
+```
+```{r}
+FVDDP
+```
+In this chunk of code, for example, $\theta = 1.28$ and $P_0 \sim \mathrm{Po(5)}$. Note that when printing the process, it is explicitly stated that no data has been included within the model.
+
+## Update
+
+Updating the process with data collected at time $t_0$ stored in the vector $Y_0$, the form of the latent signal becomes
+$$ X_{t_0} \ | \ Y_0 \sim  \Pi_{\alpha + \sum_{j=1}^K m_j \delta_{y_j^\ast}}. $$
+In some sense, this already is the mixture expressed in the general formula, under the specification that the vector $\mathbf{y}^\ast$ collects the unique values observed at time $t_0$, $\bfm$ stores the multiplicities of $Y_0$ with respect to $\mathbf{y}^\ast$, and $M = \{ \bfm \}$: this implies that $w_\bfm = 1$.
+
+The update is performed by means of the `update()` command, whose arguments are an `fvddp` object and a numeric vector. The returned object will include the information provided by $Y_0$. In particular:
+
+* $\mathbf{y}^\ast$ is stored as an ordered vector in the attribute `y.star`.
+* $M$ is stored as an integer matrix `M` of size $|M| \times K$, where $|M|$ denotes the cardinality of $M$ and $K$ is the length of $\mathbf{y}^\ast$. Each vector $\bfm$ is stored as a row of `M`.
+* $w$ is stored as a vector `w` of size $|M|$. Its $j$-th element represents the weight associated to the $j$-th row of `M`.
+```{r, results ='hide'}
+FVDDP = update(fvddp = FVDDP, y.new = c(7, 4, 9, 7))
+```
+```{r}
+FVDDP
+```
+As one could expect, updating the signal with the vector $(4,7,7,9)$ (the order of the input does not matter) leads to a degenerate mixture with $\mathbf{y}^\ast = (4,7,9)$ and $M = \{ (1,2,1)\}$. 
+
+Updating a non-empty process will have a different effect: suppose to know the law of $$X_{t_n} \ | \ Y_0, \dots, Y_{n-1} \sim \sum_{\mathbf{m} \in M} w_\bfm \Pi_{\alpha + \sum_{j=1}^K m_j \delta_{y_j^\ast}}$$ where $Y_j$ denotes a vector of values observed at time $t_j$, then
+$$X_{t_n} | Y_0 \dots, Y_n \sim \sum_{\mathbf{m} \in (M + \bfn)} w_\bfm^\phi \Pi_{\alpha + \sum_{j=1}^K m_j \delta_{y_j^\ast}}$$
+where $\bfn = (n_1, \dots, n_K)$ is the vector of multiplicities of $Y_n$ according to the unique values collected up to the same time, the new weights are such that 
+$$w_{\bfm}^\phi \propto w_\bfm\mathrm{PU}(\bfn |\bfm)$$ where $\mathrm{PU}(\bfm |\bfn)$ denoes the probability of drawing a vector of multiplicities $\bfn$ starting from $\bfm$ via Polya urn sampling scheme under $\theta$ and $P_0$ specified by the model, and
+$$M + \bfn = \{ \bfm + \bfn : \bfm \in M\}.$$. 
+Hence, the following changes will be applied to the input process of the function:
+
+* if new values are observed, they are included in `y.star`.
+* the vector $\bfn$ will be added to each row `M`.
+* the vector $w$ ill be appropriately modified and normalized in order to sum up to one.
+
+For the details of the role of Polya urn scheme on the update of mixtures of Dirichlet Processes,
+see @Antoniak1974 and @BlackwellMacQueen1973.
+
+## Propagation
+
+The propagation of the signal, also known as prediction, aims to estimate the state of the process at a time after the data is collected: in other words, in the future. If updating the signal one can get $X_{t_n} \ | \ Y_0, \dots, Y_n$, the use of the propagation leads to
+$$X_{t_n + t}\ |\ Y_0, \dots, Y_n \sim \sum_{\mathbf{n} \in L(M)} w_\bfn^\psi \Pi_{\alpha + \sum_{j=1}^K n_j \delta_{y_j^\ast}}.$$
+This means that the probability mass is shifted to a set $$L(M) = \{ \bfn \in M : \exists \ \bfm \in M : \bfn \leq \bfm\}$$
+where the notation $\bfn \leq \bfm$ implies that $n_j \leq m_j \ \forall j \in \{1, \dots, K\}$. The new weights are such that
+$$w_\bfn^\phi = \sum_{\bfm \in M : \bfn \leq \bfm} w_\bfm p_{\bfm, \bfn}(t)$$ and $p_{\bfm, \bfn}(t)$ represents the probability of reaching $\bfn$ starting from $\bfm$ in a time $t$ for a $K$-dimensional death process, as shown in @Tavaré1984; however, the exact value of such probability, stated in @PapaspiliopoulosRuggieroSpanò2016 is 
+$$p_{\bfm, \bfn}(t)=
+\begin{cases}
+        e^{-\lambda_{|\bfm|}t} \quad  &\text{if} \ \bfn = \bfm\\
+    C_{|\bfm|, |\bfn |}(t) \mathrm{MVH} (\bfn ; |\bfn|, \bfm) \quad &\text{if} \ \bfn < \bfm\\
+    \end{cases}$$
+where $\lambda_{|\bfm|} = \frac{|\bfm|(\theta + |\bfm | -1)}{2}$ and $$C_{|\bfm|, |\bfn |}(t) = \big(\prod_{h=|\bfn | + 1}^{|\bfm |} \lambda_{h} \big)  (-1)^{|\bfm|-|\bfn|} \sum_{k=|\bfn |}^{|\bfm|} \frac{e^{-\lambda_{k} t}}{\prod_{|\bfn | \leq h \leq |\bfm |, h \neq k }(\lambda_{k} - \lambda_{h})}$$
+and $|\bfm|$ represents the $L^1$ norm (i.e. the sum) of the vector $\bfm$.
+
+The `propagate()` function can be exploited to propagate the signal. Its arguments are an `fvddp` object and a (positive) time. The result is the propagated process, whose matrix `M` will be larger and whose weights will be as described in the formulae above.
+
+```{r, results='hide'}
+FVDDP = propagate(fvddp = FVDDP, delta.t = 0.6)
+```
+```{r}
+FVDDP
+```
+The example shows the propagation of the signal introduced in the previous section, with $t = 0.6$. Note that `y.star` does not vary. Also, note that in examples like this, it is sufficient a time $t \simeq 2$ to shift almost all the mass to the component of the mixture characterized by the zero vector.
+```{r, hide=T}
+FVDDP = update(fvddp = FVDDP, y.new = c(4, 7, 7, 10, 10, 5))
+```
+```{r}
+FVDDP
+```
+
+The latter chunk shows an application of `update()` on a larger process. A larger vector `y.new` may induce large variations in the weights. Being it of size $3$, the example does not cause an immediately recognizable effect.
+
+
+## Smoothing
+
+In the theory of Hidden Markov Models, the smoothing operator is used to infer the state of the signal given observations from the past, the present and the future. In other words, one can estimate $X_t$ when $t \leq t_n$, exploiting all collected data. 
+
+To do so, it has been shown by @AscolaniLijoiRuggiero2023 that it is necessary to create two processes. The first has to be propagated forward from $t_0$ to $t-{i-1}$ as in the previous sections; the second one has to be run backward using the same strategy: initialize and update it at $t_n$ and propagate it towards $t_{n-1}$ (with a positive time $t_n - t_{n-1}$ in the function), and sequentially update and propagate until $t_{i+1}$ is reached.
+
+Doing this, one will get that 
+$$X_{t_{i-1}} \ |\ Y_0, \dots, Y_{i-1} \sim \sum_{\bfn_{i-1} \in M_{i-1}} v_{\bfn_{i-1}} \Pi_{\alpha + \sum_{j=1}^K n_{i-1,j}\delta_{y_j^\ast}}$$
+and $$X_{t_{i+1}} \ |\ Y_{i+1}, \dots, Y_{n}=  \sum_{\bfnfuture \in M_{i+1}} v_{\bfnfuture} \Pi_{\alpha + \sum_{j=1}^K n_{i+1,j}\delta_{y_j^\ast}}$$
+where the subscript $i-1$ and $i+1$ are necessary to indicate elements from the past or the future mixture, $v$ stands for the weights and for example $n_{i-1, j}$ is the $j$-th component of the etor $\bfnpast$ (same for $\bfnfuture$). 
+
+Provided this decription based on available data from past and future, call $\bfn_i$ the multiplicities generated by the vector $Y_i$. Then
+
+$$X_{t_i} \ |\ X_{t_{i-1}}, X_{t_{i+1}}, Y_i \sim  \sum_{\substack{\bfnpast \\ \in M_{i-1}}}\sum_{\substack{\bfnfuture \\ \in M_{i+1}}}  v_{\bfnpast} v_{\bfnfuture} \sum_{\substack{(\bfkpast, \bfkfuture) \\ \in \mathcal{D}^{\bfnpast, \bfnfuture}}} w_{\bfkpast, \bfn_i, \bfkfuture}^{\bfnpast, \bfnfuture} \Pi_{\alpha  + \sum_{j=1}^K (\bfk_{i-1, j} + \bfn_{i,j} + \bfk_{i+1, j} )\delta_{y_j^\ast}}$$
+where:
+
+* if $P_0$ is non-atomic, define the sets
+$$ \mathcal{D}_{i-1} := \{ j \in \{ 1, \dots, K\} : n_{i-1, j} > 0 \ \text{and either} \ n_{i,j}>0 \ \text{or} \  n_{i+1,j}>0 \},$$
+$$\mathcal{D}_{i+1} := \{ j \in \{ 1, \dots, K\} : n_{i+1, j} > 0 \ \text{and either} \ n_{i,j}>0 \ \text{or} \  n_{i-1,j}>0 \}$$
+and $$
+\mathcal{S} := \mathcal{D}_{i-1} \cup \mathcal{D}_{i+1}$$
+to express the indices of shared values among different times. Then
+$$\begin{align*} \mathcal{D}^{\bfnpast,\bfnfuture} = \{ (\bfkpast, \bfkfuture) : &\bfkpast \leq \bfnpast \ \text{and} \ k_{i-1, j} > 0 \ \forall \ j \in \mathcal{D}_{i-1},\\
+    &\bfkfuture \leq \bfnfuture \ \text{and}  \ k_{i+1, j} > 0 \ \forall \ j \in \mathcal{D}_{i+1} \} \end{align*}$$
+    and the weights are such that:
+    
+    * if $\mathcal{S} = \emptyset$:
+    $$w_{\bfkpast, \bfn_i, \bfkfuture}^{\bfnpast, \bfnfuture}\ \propto \tilde{p}_{\bfkpast, \bfkfuture}^{\bfnpast, \bfnfuture} \frac{\theta^{(|\bfkpast|)} \theta^{(|\bfkfuture|)}}{(|\theta + |\bfn_i|)^{(|\bfkpast|+|\bfkfuture|)}}$$
+    * if $\mathcal{S} \neq \emptyset$:
+$$w_{\bfkpast, \bfn_i, \bfkfuture}^{\bfnpast, \bfnfuture} \ \propto \tilde{p}_{\bfkpast, \bfkfuture}^{\bfnpast, \bfnfuture} \frac{\theta^{(|\bfkpast|)} \theta^{(|\bfkfuture|)}}{(|\theta + |\bfn_i|)^{(|\bfkpast|+|\bfkfuture|)}} \\ \times \prod_{j \in \mathcal{S}}\frac{(k_{i-1, j} + n_{i,j} + k_{i+1,j}-1)!}{(k_{i-1,j}-1)! (n_{i,j}-1)! (k_{i-1,j}-1)!} $$
+if $(\bfkpast, \bfkfuture) \in \mathcal{D}$, and $0$ otherwise, under the convention that $(-1)!=1$.
+
+* if $P_0$ is atomic, let $$\mathcal{D}^{\bfnpast, \bfnfuture}:=\{ (\bfkpast, \bfkfuture) : \bfkpast \leq \bfnpast, \bfkfuture \leq \bfnfuture\}$$
+and the weights can be expressed as $$
+ w_{\bfkpast, \bfn_i, \bfkfuture}^{\bfnpast, \bfnfuture}\ \propto \tilde{p}_{\bfkpast, \bfkfuture}^{\bfnpast, \bfnfuture} \frac{m(\bfkpast + \bfn_i +\bfkfuture)}{m(\bfkpast)m(\bfn_i)m(\bfkfuture)}$$
+
+where 
+$$\tilde{p}_{\bfkpast, \bfkfuture}^{\bfnpast, \bfnfuture} = p_{\bfnpast, \bfkpast}(t_i - t_{i-1})p_{\bfnfuture, \bfkfuture}(t_{i+1} - t_i)$$ is the joint transition probability from $\bfnpast$ to $\bfkpast$ in time $t_i - t_{i-1}$ and from $\bfnfuture$ to $\bfkfuture$ in time $t_{i+1} - t_i$ and $m(\cdot)$ is the marginal likelihood function of multiplicities in the atomic case.
+
+This peculiar structure, developed in @AscolaniLijoiRuggiero2023, can be better understood with some examples. They can be shown in this implementation with `smooth()`. The arguments are two latent signals (`fvddp.past` and `fvddp.future`), the positive times $t_i - t_{i-1}$ (`t.past`) and $t_{i+1} - t_i$ (`t.future`) and the data collected at time $t_i$ (`y.new`).
+```{r, results ='hide'}
+FVDDP_NONATOMIC = initialize(theta = 0.7, sampling.f = function(x) rbeta(x, 4, 7),
+                          density.f = function(x) dbeta(x, 4, 7), atomic = FALSE)
+FVDDP_PAST_NONATOMIC = update(fvddp = FVDDP_NONATOMIC, y.new = c(0.210, 0.635, .541))
+FVDDP_FUTURE_NONATOMIC = update(fvddp = FVDDP_NONATOMIC, y.new = c(0.210))
+FVDDP_FUTURE_NONATOMIC = propagate(fvddp = FVDDP_FUTURE_NONATOMIC, delta.t = 0.4)
+FVDDP_FUTURE_NONATOMIC = update(fvddp = FVDDP_FUTURE_NONATOMIC, y.new = c(.635))
+```
+In the example above, two process we created with $\theta = 0.7$ and $P_0 \sim \mathrm{Beta}(4, 7)$. The signal was updated once in the past, and twice in the future (with a propagation between the two updates).
+```{r, results='hide'}
+FVDDP_SMOOTH_NONATOMIC = smooth(fvddp.past = FVDDP_PAST_NONATOMIC, fvddp.future = FVDDP_FUTURE_NONATOMIC,
+                                t.past = 0.75, t.future = 0.3, y.new = c(0.210, 0.635, 0.479))
+```
+
+```{r}
+FVDDP_SMOOTH_NONATOMIC
+```
+Using the function on the two processes, it is possible to see that the structure described above for the nonatomic case causes a shrinkage of the mixture. Indeed, the set $M$ only contains three vectors.
+
+In order to make a comparison, one can try to do something similar taking $P_0 \sim \mathrm{Binom}(10, 0.6)$.
+
+```{r, results ='hide'}
+FVDDP_ATOMIC = initialize(theta = 0.7, sampling.f = function(x) rbeta(x, 10, 0.6),
+                          density.f = function(x) dbinom(x, 10, 0.6), atomic = TRUE)
+FVDDP_PAST_ATOMIC = update(fvddp = FVDDP_ATOMIC, y.new = c(2, 6, 5))
+FVDDP_FUTURE_ATOMIC = update(fvddp = FVDDP_ATOMIC, y.new = c(2))
+FVDDP_FUTURE_ATOMIC = propagate(fvddp = FVDDP_FUTURE_ATOMIC, delta.t = 0.4)
+FVDDP_FUTURE_ATOMIC = update(fvddp = FVDDP_FUTURE_ATOMIC, y.new = c(6))
+```
+As before, the mixture referred to pas observations is updated once, the one referred to future observations is updated twice.
+```{r, results='hide'}
+FVDDP_SMOOTH_ATOMIC = smooth(fvddp.past = FVDDP_PAST_ATOMIC, fvddp.future = FVDDP_FUTURE_ATOMIC,
+                             t.past = 0.75, t.future = 0.3, y.new = c(2, 6, 4))
+```
+   
+```{r}
+FVDDP_SMOOTH_ATOMIC
+```
+In this case, the mixture is clearly bigger. The reason is that when $P_0$ is atomic, the set $\mathcal{D}^{\bfnpast, \bfnfuture}$ does not put constraints based on the appearance of shared values across diffferent times. 
+
+## Approximations
+
+Past examples should also provide an insight on the main issue related to `propagate()`
+and `smooth()`: the size of the matrix $M$ grows polynomially with respect to the amount of collected data; moreover, it can be seen that as the number of weights increases, many of them become almost negligible. 
+
+In order to avoid long computations, it is possible to use `approx.propagate()`: it reproduces the propagation of the signal by means of Monte Carlo method. The idea, proposed by @AscolaniLijoiRuggiero2021, is to mimic the evolution of the $K$-dimensional death process using a one-dimensional one, and then extracting a multidimensional vector with a multivariate hypergeometic distributions. 
+
+```{r, results = 'hide'}
+FVDDP =initialize(theta = 3, sampling.f= function(x) rnorm(x, -1, 3),
+                  density.f = function(x) dnorm(x, -1, 3), atomic = FALSE)
+FVDDP = update(fvddp = FVDDP, y.new = c(-1.145, 0.553, 0.553, 0.553))
+```
+In the previous chunk, a process with hyperparameters $\theta = 3$ and $P_0 \sim \mathcal{N}(-1, 3)$. The syntax of the approximating functions is just the same as in `propagate()`, with the exceptions that one must specify the number of samples `N` to be drawn.
+
+```{r, results='hide'}
+FVDDP_APPR_PROP = approx.propagate(fvddp = FVDDP, delta.t = 0.45, N = 20000)
+```
+```{r}
+FVDDP_APPR_PROP
+```
+The results is agin an `fvddp` object. In order to measure the accuracy of such approximation, one has to compute the exact output of the propagation, again with time $t=0.45$.
+```{r, results='hide'}
+FVDDP_EXACT_PROP = propagate(fvddp = FVDDP, delta.t = 0.45)
+```
+Then one can measure the difference in the weights with `error.estimate()`. The arguments are `fvddp.exact` and `fvddp.approx`, and the output is a vector containing the difference among the weights, in absolute value. The option `remove.unmatched` allows to choose whenever a vector is in the exact propagation but not in the approximate: if `TRUE`, the missing weight is assumed to be $0$, if `FALSE`, this comparison will not be reported in the output (which will result to be shorter).
+```{r}
+error.estimate(FVDDP_EXACT_PROP, FVDDP_APPR_PROP)
+```
+
+Something similar can be done for the smoothing via `approximate.smooth()`; in this case the Monte Carlo method is necessary to support importance sampling, where the importances are given by the right hand side of the formulae for $w_{\bfkpast, \bfn_i, \bfkfuture}^{\bfnpast, \bfnfuture}$. For this reason, the result of the simulation may be less stable than in the case of the propagation seen above, and a larger amount of samples will be required to achieve a good accuracy.
+
+In the following example, one can see how to copy the one done in the exact smoothing
+```{r, results='hide'}
+FVDDP_SMOOTH_APPR = approx.smooth(fvddp.past = FVDDP_PAST_ATOMIC, fvddp.future = FVDDP_FUTURE_ATOMIC,
+                             t.past = 0.75, t.future = 0.3, y.new = c(2, 6, 4), N = 50000)
+```
+```{r}
+FVDDP_SMOOTH_APPR
+```
+```{r}
+error.estimate(FVDDP_SMOOTH_ATOMIC, FVDDP_SMOOTH_APPR)
+```
+
+## Pruning
+
+Another tool to cut the computational cost of predictive of smoothing inference is given by the `prune()` function. It allows to remove from the mixture all vectors $\bfm$ whose weight $w_\bfm$ is under some treshold $\varepsilon$. Such eights are then normalized such taht their sum is $1$.
+
+In the example, the function will be applied to one of the processes prevously calculated, fixing $\varepsilon = 10^{-2}$.
+```{r}
+PRUNED = prune(fvddp = FVDDP_SMOOTH_ATOMIC, eps = 1e-02)
+```
+```{r}
+PRUNED
+```
+In this context, the treshold is insanely high; this is done for the unique purpose of showing how the function works; in the practical use of the package, a reasonable $\varepsilon$ is between $10^{-9}$ and the machine epsilon of the computer in use.
+
+## Posterior sampling
+
+The last task that it can be performed is sampling values from Fleming-Viot dependent Dirichlet Processes. This can be done by simply choosing a vector $w_\bfm$ and drawing a value from $P_0$ with probability $\frac{\theta}{\theta + |\bfm|}$, or choosing $y_m^\ast$ with probability $\frac{m_j}{\theta + |\bfm|}$. To get a sample of size $N$, it is sufficient to replicate this mechanism $n$ times.
+
+The implementation is named `posterior.sample()`. Its arguments are the signal and the number `N` of values to draw.
+
+```{r, results = 'hide'}
+y = posterior.sample(fvddp = FVDDP_EXACT_PROP, N = 100)
+```
+```{r}
+table(round(y, 3))
+```
+The command `table()` was used here to display more efficiently how many times each value has been sampled.
+
+## Predictive structure
+
+In the Bayesian Nonparametric framework, scientists prefer to use the predictive structure of the Dirichlet process when they want to picture how future observations will be like. This choice is strongly related to the exchangeability assumption underlying the model (more in @GhoshalVanDerVaart2017); in this context, however, it is sufficient to say that predictive structure is nothing but the sequential use of posterior sampling and update. In fact, a value is repeatedly drawn from the mixture and it is incorporated within each vector $\bfm \in M$ via an update. A full description of this mechanism was developed by @AscolaniLijoiRuggiero2021.
+
+This is implemented via `predictive.struct()`; the arguments are the same as in `posterior.sample()`. 
+```{r, results = 'hide'}
+y = predictive.struct(fvddp = FVDDP_EXACT_PROP, N = 100)
+```
+```{r}
+table(round(y, 3))
+```
+
+## Bibliography
