@@ -635,7 +635,7 @@ std::map<std::vector<int>, double> &m_map, NumericMatrix &nonatomic_w_matrix){
     int K = n.length();
 
     //initialize the importance
-    double imp;
+    double imp = 0.0;
 
     //in case the measure is atomic
     if(atomic == true){
