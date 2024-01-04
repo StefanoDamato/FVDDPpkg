@@ -4,7 +4,7 @@ Title: Implement Fleming-Viot-dependent Dirichlet Processes
 Version: 0.0.1
 Author: Stefano Damato
 Maintainer: Stefano Damato <stefano.damato@edu.unito.it>
-Description: A bayesian nonparametric model for the study of time-evolving frequencies
+Description: A bayesian nonparametric model for the study of time-evolving frequencies.
 License: LGPL (>= 3)
 Encoding: UTF-8
 LazyData: true

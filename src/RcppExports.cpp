@@ -88,12 +88,28 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// compute_errors_cpp
+NumericVector compute_errors_cpp(NumericMatrix M_exact, NumericVector w_exact, NumericMatrix M_approx, NumericVector w_approx, bool rm_unmatched);
+RcppExport SEXP _FVDDPpkg_compute_errors_cpp(SEXP M_exactSEXP, SEXP w_exactSEXP, SEXP M_approxSEXP, SEXP w_approxSEXP, SEXP rm_unmatchedSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type M_exact(M_exactSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type w_exact(w_exactSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type M_approx(M_approxSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type w_approx(w_approxSEXP);
+    Rcpp::traits::input_parameter< bool >::type rm_unmatched(rm_unmatchedSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_errors_cpp(M_exact, w_exact, M_approx, w_approx, rm_unmatched));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_FVDDPpkg_compute_new_weights_cpp", (DL_FUNC) &_FVDDPpkg_compute_new_weights_cpp, 6},
     {"_FVDDPpkg_compute_M_w_cpp", (DL_FUNC) &_FVDDPpkg_compute_M_w_cpp, 14},
     {"_FVDDPpkg_montecarlo_sample_prop_cpp", (DL_FUNC) &_FVDDPpkg_montecarlo_sample_prop_cpp, 5},
     {"_FVDDPpkg_montecarlo_sample_smooth_cpp", (DL_FUNC) &_FVDDPpkg_montecarlo_sample_smooth_cpp, 13},
+    {"_FVDDPpkg_compute_errors_cpp", (DL_FUNC) &_FVDDPpkg_compute_errors_cpp, 5},
     {NULL, NULL, 0}
 };
 

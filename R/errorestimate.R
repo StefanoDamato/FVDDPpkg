@@ -44,31 +44,10 @@ error.estimate = function(fvddp.exact, fvddp.approx, remove.unmatched = F) {
   if (class(fvddp.approx) != 'fvddp') stop(deparse(substitute(fvddp.approx)), ' not in "fvddp" class')
 
   #check the identity of all rows
-  approx.w.sorted = apply(fvddp.exact$M, 1, retrieve.weight, fvddp.approx$M, fvddp.approx$w)
+  errors = compute_errors_cpp(fvddp.exact$M, fvddp.exact$w,
+                              fvddp.approx$M, fvddp.approx$w, remove.unmatched)
 
-  #find the NAs in the vector
-  missing.idx = is.na(approx.w.sorted)
-
-  #in this case, remove the indices elatted to the NAs
-  if (remove.unmatched == T) return(abs(fvddp.exact$w[!missing.idx] -
-                                          approx.w.sorted[!missing.idx]))
-
-  #otherwise set the missing values as 0 and return the difference
-  if (remove.unmatched == F){
-    approx.w.sorted[missing.idx] = 0
-    return(abs(fvddp.exact$w - approx.w.sorted))
-  }
-}
-
-#find the corresponding weight of v in the approximate fvddp
-retrieve.weight = function(v, M.approx, w.approx){
-
-  #find indexes of v in the approximate matrix
-  idx = apply(M.approx, 1, function(x) all(x == v))
-
-  #it it exists, return corresponding weight
-  if(any(idx)) return(w.approx[idx])
-
-  #otherwise is NA
-  else return(NA)
+  #in this case, remove the indices related to the NAs
+  if (remove.unmatched == T) errors = errors[!is.na(errors)]
+  return(abs(errors))
 }

@@ -858,3 +858,44 @@ double theta, NumericVector theta_P0_ystar, NumericMatrix &nonatomic_w_matrix){
     //return a list with both the matrix and the weight
     return List::create(_["M"] = M_new , _["w"] = w_new);
 }
+
+
+//[[Rcpp::export]]
+NumericVector compute_errors_cpp(NumericMatrix M_exact, NumericVector w_exact, 
+                            NumericMatrix M_approx, NumericVector w_approx, bool rm_unmatched){
+
+    //create a map to search the approximaye weightds
+    std::map<std::vector<int>, double> weights_approx;
+
+    //iterate on the rows of M approximate
+    for(int i = 0; i < M_approx.nrow(); i++){
+
+        //fill the map (the vector is the key)
+        NumericVector v_approx = M_approx(i,_);
+        weights_approx[as<std::vector<int>>(v_approx)] = w_approx[i];
+    }
+
+    //initialize the errors
+    NumericVector errors(M_exact.nrow());
+
+    //iterate on the rows of the exact process
+    for(int i = 0; i < M_exact.nrow(); i++){
+
+        //use the vector as a key and get the approximate weight
+        NumericVector v_exact = M_exact(i,_);
+        double w_appr_v = weights_approx[as<std::vector<int>>(v_exact)];
+
+        //if the vector is absent is absent in the approximate and we want to remove it, save as NA
+        if ((w_appr_v == 0) & (rm_unmatched == true)){
+            errors[i] = NA_REAL;
+        }
+
+        //otherwise just save the difference
+        else{
+            errors[i] = w_exact[i] - weights_approx[as<std::vector<int>>(v_exact)];
+        }
+    }
+
+    //return the errors
+    return errors;
+}

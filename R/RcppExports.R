@@ -17,3 +17,7 @@ montecarlo_sample_smooth_cpp <- function(M_past, M_future, n, t_past, t_future, 
     .Call('_FVDDPpkg_montecarlo_sample_smooth_cpp', PACKAGE = 'FVDDPpkg', M_past, M_future, n, t_past, t_future, w_past, w_future, N, atomic, lambda, theta, theta_P0_ystar, nonatomic_w_matrix)
 }
 
+compute_errors_cpp <- function(M_exact, w_exact, M_approx, w_approx, rm_unmatched) {
+    .Call('_FVDDPpkg_compute_errors_cpp', PACKAGE = 'FVDDPpkg', M_exact, w_exact, M_approx, w_approx, rm_unmatched)
+}
+

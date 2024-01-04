@@ -254,7 +254,7 @@ error.estimate(FVDDP_SMOOTH_ATOMIC, FVDDP_SMOOTH_APPR)
 
 ## Pruning
 
-Another tool to cut the computational cost of predictive of smoothing inference is given by the `prune()` function. It allows to remove from the mixture all vectors $\bfm$ whose weight $w_\bfm$ is under some treshold $\varepsilon$. Such eights are then normalized such taht their sum is $1$.
+Another tool to cut the computational cost of predictive of smoothing inference is given by the `prune()` function. It allows to remove from the mixture all vectors $\bfm$ whose weight $w_\bfm$ is under some treshold $\varepsilon$. Such eights are then normalized such that their sum is $1$.
 
 In the example, the function will be applied to one of the processes prevously calculated, fixing $\varepsilon = 10^{-2}$.
 ```{r}
