@@ -3,7 +3,7 @@
 
 ### R implementation of Fleming-Viot-dependent Dirchlet Processes
 
-:computer: The package contains the first implementation of Fleming-Viot dependent Dirichlet processes, a model of Bayesian Nonparametric statistics used in populuation genetics. 
+:computer: The package contains the first implementation of Fleming-Viot dependent Dirichlet processes, a model of Bayesian Nonparametric statistics used in populuation genetics.\
 The model consists of a Hidden Markov Model (HMM) in which the latent signal is a distribution-valued stochastic process that takes the form of a finite mixture of Dirichlet processes, indexed by vectors that count how many times each value is observed in the population.
 
 In particular, the package allows to:
@@ -13,7 +13,7 @@ In particular, the package allows to:
 * update the structure of the model with data, modifying the latent signal.
 * propagate the latent signal in the past or in the future for any time, given the current state.
 * smooth the latent signal given observations from the past, the present and the future.
-* sample from the process
+* sample from the process.
 * exploit the predictive structure to make inference.
 
 For clarifications and examples of use, please refer to the vignette in the package documentation or on [GitHub](https://github.com/StefanoDamato/FVDDPpkg/blob/master/vignettes/FVDDPpkg.Rmd).
@@ -42,9 +42,10 @@ install.packages("FVDDPpkg", dependencies = True)
 
 ### Citation
 
-:book: A paper on the package and new algorithms it implements is currently under review. 
+:book: A paper on the package and new algorithms it implements is currently under review.\ 
 Its publication will be notified here now.
-At the moment, the most comprehensive work you can cite are
+
+At the moment, the most comprehensive works you can cite are
 ```
 @article{AscolaniLijoiRuggiero2021,
 author = {Filippo Ascolani and Antonio Lijoi and Matteo Ruggiero},
