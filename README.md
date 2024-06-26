@@ -24,7 +24,7 @@ For a rigorous theoretical approach, read [Ascolani et al. (2021)](https://proje
 ### Installation
 
 
-:cat: To install from GitHub, make sure you have the `\texttt{devtools}` package installed.
+:cat: To install from GitHub, make sure you have the `devtools` package installed.
 ```
 install.packages("devtools")
 ```
@@ -79,4 +79,4 @@ URL = {https://doi.org/10.3150/22-BEJ1504}
 
 ### Contacts
 
-:e-mail: For questions, contributions or bug reports contact me at `\texttt{stefano.damato@idsia.ch}` or use the [issues section](https://github.com/StefanoDamato/FVDDPpkg/issues) on the GitHub repository.
+:e-mail: For questions, contributions or bug reports contact me at `stefano.damato@idsia.ch` or use the [issues section](https://github.com/StefanoDamato/FVDDPpkg/issues) on the GitHub repository.
