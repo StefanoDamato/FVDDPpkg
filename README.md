@@ -18,7 +18,7 @@ In particular, the package allows to:
 
 For clarifications and examples of use, please refer to the vignette in the package documentation or on [GitHub](https://github.com/StefanoDamato/FVDDPpkg/blob/master/vignettes/FVDDPpkg.Rmd).
 
-For a rigorous theoretical approach, read [Ascolani et al. (2021)](https://projecteuclid.org/journals/bayesian-analysis/advance-publication/Predictive-inference-with-FlemingViot-driven-dependent-Dirichlet-processes/10.1214/20-BA1206.full} and [Ascolani et al. (2023)](https://projecteuclid.org/journals/bernoulli/volume-29/issue-2/Smoothing-distributions-for-conditional-FlemingViot-and-DawsonWatanabe-diffusions/10.3150/22-BEJ1504.short)
+For a rigorous theoretical approach, read [Ascolani et al. (2021)](https://projecteuclid.org/journals/bayesian-analysis/advance-publication/Predictive-inference-with-FlemingViot-driven-dependent-Dirichlet-processes/10.1214/20-BA1206.full) and [Ascolani et al. (2023)](https://projecteuclid.org/journals/bernoulli/volume-29/issue-2/Smoothing-distributions-for-conditional-FlemingViot-and-DawsonWatanabe-diffusions/10.3150/22-BEJ1504.short)
 
 
 ### Installation
