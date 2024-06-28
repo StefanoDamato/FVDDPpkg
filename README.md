@@ -42,8 +42,7 @@ install.packages("FVDDPpkg", dependencies = True)
 
 ### Citation
 
-:book: A paper on the package and new algorithms it implements is currently under review.\ 
-Its publication will be notified here now.
+:book: A paper on the package and new algorithms it implements is currently under review. Its publication will be notified here now.
 
 At the moment, the most comprehensive works you can cite are
 ```
