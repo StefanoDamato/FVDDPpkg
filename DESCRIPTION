@@ -1,10 +1,10 @@
 Package: FVDDPpkg
 Type: Package
-Title: Implement Fleming-Viot-dependent Dirichlet Processes
-Version: 0.0.1
+Title: Implement Fleming-Viot-Dependent Dirichlet Processes
+Version: 0.1.2
 Author: Stefano Damato
 Maintainer: Stefano Damato <stefano.damato@idsia.ch>
-Description: A bayesian nonparametric model for the study of time-evolving frequencies.
+Description: A Bayesian Nonparametric model for the study of time-evolving frequencies.
 License: LGPL (>= 3)
 Encoding: UTF-8
 LazyData: true
