@@ -28,9 +28,9 @@
 #' }
 update = function(fvddp, y.new) {
 
-  if (class(fvddp) != 'fvddp') stop(deparse(substitute(fvddp)), ' not in "fvddp" class')
+  if (!inherits(fvddp, "fvddp")) stop(deparse(substitute(fvddp)), ' not in "fvddp" class')
 
-  #if the nodel is empty
+  #if the model is empty
   if (is.null(fvddp$y.star)) {
 
     #update all the terms in the fvddp list

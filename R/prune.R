@@ -25,7 +25,7 @@
 prune = function(fvddp, eps){
 
   #check the class of the fvddp
-  if (class(fvddp) != 'fvddp') stop(deparse(substitute(fvddp)), ' not in "fvddp" class')
+  if (!inherits(fvddp, "fvddp")) stop(deparse(substitute(fvddp)), ' not in "fvddp" class')
 
   #check eps
   if (eps > 1) stop('eps must be positive and < 1')

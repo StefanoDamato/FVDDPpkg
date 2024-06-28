@@ -30,7 +30,7 @@
 propagate = function(fvddp, delta.t) {
 
   #check the class of the fvddp
-  if (class(fvddp) != 'fvddp') stop(deparse(substitute(fvddp)), ' not in "fvddp" class')
+  if (!inherits(fvddp, "fvddp")) stop(deparse(substitute(fvddp)), ' not in "fvddp" class')
 
   #first we exclude two simple cases
   if (delta.t < 0) stop('negative times not accepted')

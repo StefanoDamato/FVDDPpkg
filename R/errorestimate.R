@@ -40,8 +40,10 @@
 error.estimate = function(fvddp.exact, fvddp.approx, remove.unmatched = F) {
 
   #check the class of the fvddp
-  if (class(fvddp.exact) != 'fvddp') stop(deparse(substitute(fvddp.exact)), ' not in "fvddp" class')
-  if (class(fvddp.approx) != 'fvddp') stop(deparse(substitute(fvddp.approx)), ' not in "fvddp" class')
+  if (!inherits(fvddp.exact, "fvddp")) stop(deparse(substitute(fvddp.exact)),
+                                            ' not in "fvddp" class')
+  if (!inherits(fvddp.approx, "fvddp")) stop(deparse(substitute(fvddp.approx)),
+                                             ' not in "fvddp" class')
 
   #check the identity of all rows
   errors = compute_errors_cpp(fvddp.exact$M, fvddp.exact$w,

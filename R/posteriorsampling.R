@@ -19,7 +19,7 @@
 posterior.sample = function(fvddp, N) {
 
   #check the class of the fvddp
-  if (class(fvddp) != 'fvddp') stop(deparse(substitute(fvddp)), ' not in "fvddp" class')
+  if (!inherits(fvddp, "fvddp")) stop(deparse(substitute(fvddp)), ' not in "fvddp" class')
 
   #initialize the empty vector of new values
   y = rep(NA, N)

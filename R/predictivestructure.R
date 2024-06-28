@@ -23,7 +23,7 @@
 predictive.struct = function(fvddp, N) {
 
   #check the class of the fvddp
-  if (class(fvddp) != 'fvddp') stop(deparse(substitute(fvddp)), ' not in "fvddp" class')
+  if (!inherits(fvddp, "fvddp")) stop(deparse(substitute(fvddp)), ' not in "fvddp" class')
 
   #initialize an empty vector
   y = rep(NA, N)

@@ -22,7 +22,7 @@
 summary.fvddp = function(object, ..., rows = F, K = T){
 
   #check that the argument of the class is correct
-  if (class(object) != 'fvddp') stop(deparse(substitute(object)), ' not in "fvddp" class')
+  if (!inherits(object, "fvddp")) stop(deparse(substitute(object)), ' not in "fvddp" class')
 
   #group M and w in a spaced dataframe
   df = as.data.frame(object$M)

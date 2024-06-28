@@ -44,10 +44,10 @@
 smooth = function(fvddp.past, fvddp.future, t.past, t.future, y.new){
 
   #check the class of the arguments
-  if (class(fvddp.past) != 'fvddp') stop(deparse(substitute(fvddp.past)),
+  if (!inherits(fvddp.past, "fvddp")) stop(deparse(substitute(fvddp.past)),
                                          ' not in "fvddp" class')
   #check the class of the fvddp
-  if (class(fvddp.future) != 'fvddp') stop(deparse(substitute(fvddp.future)),
+  if (!inherits(fvddp.future, "fvddp")) stop(deparse(substitute(fvddp.future)),
                                            ' not in "fvddp" class')
 
   #we need the processes (from both past and future) to have the same theta and P0
