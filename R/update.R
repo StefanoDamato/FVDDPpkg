@@ -94,7 +94,7 @@ polya.urn = function(y.new, y.tab, theta, density.f, atomic) {
   if (all(y.new == 0)) return(1)
 
   #in this case, we cannot draw the same observation twice from P_0 (a.s.)
-  if(atomic == F) {
+  if(atomic == FALSE) {
 
     #(theta)^(amount of new values)
     p = prod(c(prod(theta*gamma(y.new[(y.new != 0) & (y.tab == 0)])),
@@ -105,7 +105,7 @@ polya.urn = function(y.new, y.tab, theta, density.f, atomic) {
   }
 
   #if P_0 is discrete, we can resample from P_0 too
-  else if (atomic == T) {
+  else if (atomic == TRUE) {
 
     #use the vectorization property of R's function
     p = prod(gamma(theta*density.f(as.numeric(names(y.new))[y.new != 0])

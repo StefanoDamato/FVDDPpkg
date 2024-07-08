@@ -19,7 +19,7 @@
 #' FVDDP = update(FVDDP, rpois(4, 2))
 #' FVDDP = propagate(FVDDP, 0.5)
 #' summary(FVDDP)
-summary.fvddp = function(object, ..., rows = F, K = T){
+summary.fvddp = function(object, ..., rows = FALSE, K = TRUE){
 
   #check that the argument of the class is correct
   if (!inherits(object, "fvddp")) stop(deparse(substitute(object)), ' not in "fvddp" class')
@@ -30,7 +30,7 @@ summary.fvddp = function(object, ..., rows = F, K = T){
   df$weights = object$w
 
   #in case K has to be printed, add a space to it
-  if (K == T) {
+  if (K == TRUE) {
     df$' ' = rep(' ', length(object$w))
     df$K = apply(object$M, 1, function(x) sum(x!=0))
   }

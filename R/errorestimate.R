@@ -37,7 +37,7 @@
 #' APPROX = approx.smooth(FVDDP.PAST, FVDDP.FUTURE, 0.4, 0.3, c(1,3), 20000)
 #' #compute the error again
 #' error.estimate(fvddp.exact = EXACT, fvddp.approx = APPROX)
-error.estimate = function(fvddp.exact, fvddp.approx, remove.unmatched = F) {
+error.estimate = function(fvddp.exact, fvddp.approx, remove.unmatched = FALSE) {
 
   #check the class of the fvddp
   if (!inherits(fvddp.exact, "fvddp")) stop(deparse(substitute(fvddp.exact)),
@@ -50,6 +50,6 @@ error.estimate = function(fvddp.exact, fvddp.approx, remove.unmatched = F) {
                               fvddp.approx$M, fvddp.approx$w, remove.unmatched)
 
   #in this case, remove the indices related to the NAs
-  if (remove.unmatched == T) errors = errors[!is.na(errors)]
+  if (remove.unmatched == TRUE) errors = errors[!is.na(errors)]
   return(abs(errors))
 }

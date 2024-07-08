@@ -76,11 +76,11 @@ predictive.struct = function(fvddp, N) {
     else{
 
       #in case P0 is atomic, the mumerator includes the mass function
-      if (fvddp$is.atomic ==T) w = w*((fvddp$theta*fvddp$P0.density(y.new) + M[,idx])/
+      if (fvddp$is.atomic == TRUE) w = w*((fvddp$theta*fvddp$P0.density(y.new) + M[,idx])/
                                         (fvddp$theta + row.sums + k-1))
 
       #in case P0 is nonatomic, the polya urn scheme may need a theta in the denominator
-      else if (fvddp$is.atomic == F) w = w*(ifelse(M[,idx] == 0, fvddp$theta, M[,idx])/
+      else if (fvddp$is.atomic == FALSE) w = w*(ifelse(M[,idx] == 0, fvddp$theta, M[,idx])/
                                               (fvddp$theta + row.sums + k-1))
 
       #update the multiplicities of the selected type by 1
