@@ -4,7 +4,7 @@
 \alias{summary.fvddp}
 \title{Show the data contained within the Fleming-Viot Dependent Dirichlet Process}
 \usage{
-\method{summary}{fvddp}(object, ..., rows = F, K = T)
+\method{summary}{fvddp}(object, ..., rows = FALSE, K = TRUE)
 }
 \arguments{
 \item{object}{An element of class \code{fvddp}, created via \code{\link[=initialize]{initialize()}}.}

@@ -24,6 +24,13 @@ For a rigorous theoretical approach, read [Ascolani et al. (2021)](https://proje
 ### Installation
 
 
+:space_invader: The package has been released on CRAN!
+
+To download the latest version, just run
+```
+install.packages("FVDDPpkg", dependencies = True)
+```
+
 :cat: To install from GitHub, make sure you have the `devtools` package installed.
 ```
 install.packages("devtools")
@@ -33,12 +40,6 @@ and proceed to download using
 devtools::install_github("StefanoDamato/FVDDPpkg", build_vignettes = TRUE)
 ```
 
-:space_invader: Soon too appear on CRAN!
-
-After the acceptance, just run
-```
-install.packages("FVDDPpkg", dependencies = True)
-```
 
 ### Citation
 

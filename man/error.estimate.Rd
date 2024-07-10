@@ -4,7 +4,7 @@
 \alias{error.estimate}
 \title{Compare the performance of a Monte-Carlo estimate with respect to the exact result.}
 \usage{
-error.estimate(fvddp.exact, fvddp.approx, remove.unmatched = F)
+error.estimate(fvddp.exact, fvddp.approx, remove.unmatched = FALSE)
 }
 \arguments{
 \item{fvddp.exact}{An instance of class \code{fvddp} obtained via smoothing
