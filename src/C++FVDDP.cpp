@@ -217,7 +217,7 @@ NumericMatrix cartesian_cpp(List l){
         reps *= v.length();
 
         //repeat it and save it as a column of the matrix
-        M(_, j) = rep(rep_each(v, N/reps), reps);
+        M(_, j) = rep(rep_each(v, N/reps), reps / v.length());
     }
 
     //return the matrix
