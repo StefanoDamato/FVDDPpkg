@@ -18,7 +18,7 @@ In particular, the package allows to:
 
 For clarifications and examples of use, please refer to the vignette in the package documentation or on [GitHub](https://github.com/StefanoDamato/FVDDPpkg/blob/master/vignettes/FVDDPpkg.Rmd).
 
-For a rigorous theoretical approach, read [Ascolani et al. (2021)](https://projecteuclid.org/journals/bayesian-analysis/advance-publication/Predictive-inference-with-FlemingViot-driven-dependent-Dirichlet-processes/10.1214/20-BA1206.full) and [Ascolani et al. (2023)](https://projecteuclid.org/journals/bernoulli/volume-29/issue-2/Smoothing-distributions-for-conditional-FlemingViot-and-DawsonWatanabe-diffusions/10.3150/22-BEJ1504.short)
+The package is described in [Ascolani, Damato and Ruggiero (2024)](https://doi.org/10.1089/cmb.2024.0600). For a rigorous theoretical approach, read [Ascolani et al. (2021)](https://projecteuclid.org/journals/bayesian-analysis/advance-publication/Predictive-inference-with-FlemingViot-driven-dependent-Dirichlet-processes/10.1214/20-BA1206.full) and [Ascolani et al. (2023)](https://projecteuclid.org/journals/bernoulli/volume-29/issue-2/Smoothing-distributions-for-conditional-FlemingViot-and-DawsonWatanabe-diffusions/10.3150/22-BEJ1504.short)
 
 
 ### Installation
@@ -43,37 +43,18 @@ devtools::install_github("StefanoDamato/FVDDPpkg", build_vignettes = TRUE)
 
 ### Citation
 
-:book: A paper on the package and new algorithms it implements is currently under review. Its publication will be notified here now.
-
-At the moment, the most comprehensive works you can cite are
+:book: If you use the package, please cite [Ascolani, Damato and Ruggiero (2024)](https://doi.org/10.1089/cmb.2024.0600), which presents the package and the algorithms it implements:
 ```
-@article{AscolaniLijoiRuggiero2021,
-author = {Filippo Ascolani and Antonio Lijoi and Matteo Ruggiero},
-title = {{Predictive inference with Fleming–Viot-driven dependent Dirichlet processes}},
-volume = {16},
-journal = {Bayesian Analysis},
-number = {2},
-publisher = {International Society for Bayesian Analysis},
-pages = {371 -- 395},
-keywords = {Chinese restaurant, conveyor belt, generalized Pólya urn, Hidden Markov model, predictive distribution, random partition},
-year = {2021},
-doi = {10.1214/20-BA1206},
-URL = {https://doi.org/10.1214/20-BA1206}}
-```
-and
-```
-@article{AscolaniLijoiRuggiero2023,
-author = {Filippo Ascolani and Antonio Lijoi and Matteo Ruggiero},
-title = {{Smoothing distributions for conditional Fleming–Viot and Dawson–Watanabe diffusions}},
-volume = {29},
-journal = {Bernoulli},
-number = {2},
-publisher = {Bernoulli Society for Mathematical Statistics and Probability},
-pages = {1410 -- 1434},
-keywords = {Dirichlet process, Duality, gamma random measures, Hidden Markov model, optimal filtering, prediction},
-year = {2023},
-doi = {10.3150/22-BEJ1504},
-URL = {https://doi.org/10.3150/22-BEJ1504}
+@article{AscolaniDamatoRuggiero2024,
+author = {Filippo Ascolani and Stefano Damato and Matteo Ruggiero},
+title = {{An R Package for Nonparametric Inference on Dynamic Populations with Infinitely Many Types}},
+volume = {31},
+journal = {Journal of Computational Biology},
+number = {12},
+pages = {1305 -- 1311},
+year = {2024},
+doi = {10.1089/cmb.2024.0600},
+URL = {https://doi.org/10.1089/cmb.2024.0600}
 }
 ```
 

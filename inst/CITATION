@@ -1,0 +1,15 @@
+bibentry(
+  bibtype = "Article",
+  key = "AscolaniDamatoRuggiero2024",
+  title = "An {R} Package for Nonparametric Inference on Dynamic Populations with Infinitely Many Types",
+  author = c(person("Filippo", "Ascolani"),
+             person("Stefano", "Damato"),
+             person("Matteo", "Ruggiero")),
+  journal = "Journal of Computational Biology",
+  year = "2024",
+  volume = "31",
+  number = "12",
+  pages = "1305--1311",
+  doi = "10.1089/cmb.2024.0600",
+  header = "To cite FVDDPpkg in publications use:"
+)
